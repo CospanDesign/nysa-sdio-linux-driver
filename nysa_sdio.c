@@ -105,11 +105,13 @@ nysa_sdio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	return status;
 };
 
+/*
 static long
 nysa_sdio_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	return nysa_sdio_ioctl(filp, cmd, (unsigned long)compat_ptr(arg));
 }
+*/
 
 static int nysa_sdio_open(struct inode *inode, struct file *filp)
 {
@@ -172,7 +174,7 @@ static const struct file_operations nysa_sdio_fops = {
   .write          = nysa_sdio_write,
   .read           = nysa_sdio_read,
   .unlocked_ioctl = nysa_sdio_ioctl,
-  .compat_ioctl   = nysa_sdio_compat_ioctl,
+  //.compat_ioctl   = nysa_sdio_compat_ioctl,
   .open           = nysa_sdio_open,
   .release        = nysa_sdio_release,
   .llseek         = no_llseek,
@@ -222,7 +224,13 @@ static int nysa_sdio_probe(struct sdio_func *func,
             nysa_sdio_dev, "nysa_%s.%d",
             //func->card->host->index, func->num);
             mmc_hostname(func->card->host), func->num);
-    status = PTR_ERR_OR_ZERO(dev);
+    //status = PTR_ERR_OR_ZERO(dev);
+    if (IS_ERR(dev)) {
+      return dev;
+    }
+    else {
+      return 0;
+    }
   } else {
     //dev_dbg(&func->dev, "no minor number available!\n");
     pr_warning("No minor numbers available\n");
